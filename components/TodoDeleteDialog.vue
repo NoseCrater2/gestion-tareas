@@ -16,11 +16,11 @@
         <v-divider></v-divider>
 
         <v-card-actions>
-          <v-btn  @click="closeDialog()">
+          <v-btn :loading="isDeleting" @click="closeDialog()">
             Cancelar
           </v-btn>
           <v-spacer></v-spacer>
-          <v-btn color="error" @click="deleteTodo()">
+          <v-btn :loading="isDeleting" color="error" @click="deleteTodo()">
             Eliminar
           </v-btn>
         </v-card-actions>
@@ -47,19 +47,23 @@ export default {
   data() {
     return {
       dialog: true,
-
+      isDeleting: false,
     }
   },
 
 
   methods: {
 
-    closeDialog(){
-      this.$emit('closeDialog');
+    closeDialog(isDeleted){
+      this.$emit('closeDialog', isDeleted);
+      this.isDeleting = false;
     },
 
     deleteTodo(){
-      this.$store.dispatch('deleteById', this.todoId);
+      this.isDeleting = true;
+      this.$store.dispatch('deleteById', this.todoId).then(() => {
+        this.closeDialog(true);
+      });
       this.$store.dispatch('fetchAll');
     }
 

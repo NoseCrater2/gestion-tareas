@@ -17,50 +17,44 @@
 
       <v-divider></v-divider>
 
-      <v-card v-if="details === null">
-        <span>
-          Ocurrió un problema al cargar los detalles
-        </span>
-      </v-card>
-
-      <v-card v-else flat>
+      <v-card v-if="todoDetails" flat >
 
         <v-card-title>
-         {{ details.title}}
+         {{ todoDetails.title}}
         </v-card-title>
 
         <v-card-subtitle class="d-flex justify-space-between">
           <div>
             <v-icon>mdi-calendar</v-icon>
-            <span>{{ details.due_date }}</span>
+            <span>{{ todoDetails.due_date }}</span>
           </div>
 
           <v-icon>
-            {{details.is_completed ? 'mdi-clock-check-outline':'mdi-av-timer'}}
+            {{todoDetails.is_completed ? 'mdi-clock-check-outline':'mdi-av-timer'}}
           </v-icon>
         </v-card-subtitle>
         <v-card-text>
           <span class="font-weight-black">Descripción:</span>
-          <p v-if="!details.description" class="text-center">
+          <p v-if="!todoDetails.description" class="text-center">
             Sin descripción
           </p>
           <p >
-            {{ details.description }}
+            {{ todoDetails.description }}
           </p>
         </v-card-text>
         <v-card-text>
           <span class="font-weight-black">Comentarios:</span>
-          <p v-if="!details.comments" class="text-center">
+          <p v-if="!todoDetails.comments" class="text-center">
             Sin comentarios
           </p>
           <p >
-            {{ details.comments }}
+            {{ todoDetails.comments }}
           </p>
 
         </v-card-text>
-        <v-card-text v-if="details.tags">
+        <v-card-text v-if="todoDetails.tags">
           <v-chip
-          v-for="tag in details.tags.split(',')"
+          v-for="tag in todoDetails.tags.split(',')"
           :key="tag"
           color="primary"
           >
@@ -80,7 +74,7 @@
           </v-btn>
         </v-card-actions>
       </v-card>
-      <TodoDeleteDialog v-if="isDeleteDialogOpen" :todo-title="details.title" :todo-id="details.id" @closeDialog="sDeleteDialogOpen = false" />
+      <TodoDeleteDialog v-if="isDeleteDialogOpen" :todo-title="todoDetails.title" :todo-id="todoDetails.id" @closeDialog="closeDeleteDialog($event)" />
     </v-navigation-drawer>
 </template>
 
@@ -90,9 +84,10 @@ export default {
     TodoDeleteDialog: () => import('../components/TodoDeleteDialog.vue'),
   },
   props:{
-    details: {
-      type: Object,
+    taskId: {
+      type: Number,
       required: true,
+      default: 0
     }
   },
 
@@ -102,12 +97,36 @@ export default {
     }
   },
 
+  computed: {
+    todoDetails(){
+      return this.$store.state.details
+    },
+
+  },
+
+  watch:{
+    taskId( newValue){
+      this.$store.dispatch('fetchById', newValue);
+    }
+  },
+
+  mounted(){
+    this.$store.dispatch('fetchById', this.taskId);
+  },
+
+
   methods:{
     closeDetails(){
       this.$emit('closeDetails')
     },
     openEditDialog(){
       this.$emit('openEditDialog')
+    },
+    closeDeleteDialog(isDeleted){
+      this.isDeleteDialogOpen = false;
+      if(isDeleted){
+        this.closeDetails();
+      }
     }
   },
 

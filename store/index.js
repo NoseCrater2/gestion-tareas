@@ -2,10 +2,9 @@ export const state = () =>  ({
   todoList: [],
   details: null,
   responseStatus: {
-    code: 0,
-    message: null,
-    errors: []
-  }
+    code: null,
+    message: null
+  },
 });
 
 export const getters = {
@@ -15,36 +14,38 @@ export const getters = {
 }
 
 export const actions = {
-  fetchAll ({ commit }) {
-    this.$axios.get('tasks').then( ({data, status} )=> {
-
+ fetchAll ({ commit }) {
+    this.$axios.get('tasks').then(({data} ) => {
       commit('setTodoList', data)
-      commit('setResponseStatus', status)
-
-    }).catch( ({status}) => {
-      commit('setResponseStatus', status)
-    });
+      commit('setResponseStatus',{code: 'success', message: 'Tasks loaded'})
+    }).catch(({response})=>{
+      commit('setResponseStatus',{code: 'error', message: response.data.detail})
+    })
 
   },
 
-  async fetchById({ commit }, id) {
-    const details = await this.$axios.$get(`tasks/${id}`)
-    commit('setTodoDetails', details[0])
+  async fetchById({ commit }, taskId) {
+   const {status, data} = await this.$axios.get(`tasks/${taskId}`)
+      commit('setTodoDetails', data[0]);
+      commit('setResponseStatus',{code: status, message: 'Task loaded'})
   },
-  async createTodo({ commit }, todo) {
 
-    const {task} = await this.$axios.$post(`tasks`, todo)
-    commit('addTodo', task)
+ async createTodo({ commit }, todo) {
+   const {status, data} =  await this.$axios.post(`tasks`, todo)
+    commit('addTodo', data.task);
+    commit('setResponseStatus',{code: status, message: data.detail})
   },
 
   async updateById({ commit }, todo) {
-    const {task} = await this.$axios.$put(`tasks/${todo.id}`, todo)
-    commit('updateTodo', task)
+    const {status, data} = await this.$axios.put(`tasks/${todo.id}`, todo)
+    commit('updateTodo', data.task)
+    commit('setTodoDetails', data.task)
+    commit('setResponseStatus',{code: status, message: data.detail})
   },
 
-  async deleteById({ commit }, id) {
-    // const {detail} =
-    await this.$axios.$delete(`tasks/${id}`)
+  async deleteById({ commit }, taskId) {
+    const {status, data} =  await this.$axios.delete(`tasks/${taskId}`)
+    commit('setResponseStatus',{code: status, message: data.detail})
   },
 
 
@@ -74,13 +75,14 @@ export const mutations = {
     state.todoList.splice(state.todoList.indexOf(todo), 1)
   },
 
-  setResponseStatus(state, {code, message, errors}){
-    state.responseDetails = {code, message, errors};
+  setResponseStatus(state, responseStatus){
+    state.responseStatus = responseStatus
   },
 
   toggle(state, todo) {
     todo.done = !todo.done
   }
 }
+
 
 

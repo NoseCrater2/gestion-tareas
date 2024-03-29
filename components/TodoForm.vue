@@ -1,7 +1,7 @@
 <template>
   <v-dialog
       v-model="dialog"
-      width="500"
+      max-width="500"
       persistent
     >
       <v-card>
@@ -11,11 +11,12 @@
 
         <v-card-text>
 
-         <v-form class="ma-2">
+         <v-form ref="taskForm" class="ma-2" >
 
           <v-text-field
             v-model="todo.title"
             dense
+            :rules="[title => !!title || 'Título obligatorio']"
             label="Título"
           ></v-text-field>
 
@@ -73,11 +74,11 @@
         <v-divider></v-divider>
 
         <v-card-actions>
-          <v-btn color="error" @click="closeDialog()">
+          <v-btn color="error" :loading="isLoadingResponse" @click="closeDialog()">
             Cancelar
           </v-btn>
           <v-spacer></v-spacer>
-          <v-btn color="primary" @click="saveTodo()">
+          <v-btn color="primary" :loading="isLoadingResponse" @click="saveTodo()">
             Guardar
           </v-btn>
         </v-card-actions>
@@ -100,11 +101,7 @@ export default {
     return {
       dialog: true,
       isOpenCalendar: false,
-      tagList: [
-        'Lectura',
-        'Ocio',
-        'Tarea',
-      ],
+      isLoadingResponse: false,
       todo: {
         id: null,
         title: null,
@@ -112,7 +109,8 @@ export default {
         due_date: null,
         comments: null,
         description: null,
-        tags: []
+        tags: null,
+        token: 'ABCDE'
       }
 
     }
@@ -129,14 +127,24 @@ export default {
 
   methods: {
     closeDialog(){
-      this.$emit('closeDialog')
+      this.$emit('closeDialog');
+      this.isLoadingResponse = false;
     },
+
     saveTodo(){
-      if(this.todoEdit){
-        this.$store.dispatch('updateById', this.todo);
+      if( !this.$refs.taskForm.validate()){
         return;
       }
-      this.$store.dispatch('createTodo', this.todo);
+      this.isLoadingResponse = true;
+      if(this.todoEdit){
+        this.$store.dispatch('updateById', this.todo).then(() => {
+          this.closeDialog()
+        });
+        return;
+      }
+      this.$store.dispatch('createTodo', this.todo).then(() => {
+          this.closeDialog()
+      });
     }
 
 

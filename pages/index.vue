@@ -1,13 +1,12 @@
 <template>
   <v-row justify="center" align="center">
     <v-col>
-      <v-card flat>
-      <v-list>
-        <v-subheader>Selecciona una tarea para mostrar sus detalles</v-subheader>
-      <v-list-item-group v-model="itemSelected" @change="openDetails()">
+      <v-card flat >
+      <v-subheader>Selecciona una tarea para mostrar sus detalles</v-subheader>
+      <v-list max-height="75vh" style="overflow: auto">
+      <v-list-item-group v-model="itemSelected">
         <template v-for="(item, index) in todoList">
           <v-list-item :key="item.id" :value="item.id">
-            <template>
               <v-list-item-avatar size="50">
                 <v-icon v-if="item.is_completed" color="success" size="50">
                   mdi-check-circle
@@ -23,7 +22,6 @@
               <v-list-item-action>
                 <v-list-item-action-text > {{ item.due_date }}</v-list-item-action-text>
               </v-list-item-action>
-            </template>
           </v-list-item>
           <v-divider
             v-if="index < todoList.length - 1"
@@ -34,7 +32,7 @@
     </v-list>
   </v-card>
   </v-col>
-    <TodoDetail v-if="itemSelected"  :details="todoDetails" @closeDetails="resetVariables()" @openEditDialog="assignTodo()" />
+    <TodoDetail v-if="itemSelected"  :task-id="itemSelected" @closeDetails="resetVariables()" @openEditDialog="assignTodo()" />
     <TodoForm v-if="isOpenForm" :todo-edit="todoEdit"  @closeDialog="isOpenForm = false;"   />
     <v-btn fab large color="primary" class="add-button" @click="openForm()">
       <v-icon >
@@ -69,20 +67,14 @@ export default {
     todoDetails(){
       return this.$store.state.details
     },
-    responseStatus(){
-      return this.$store.state.getters.getResponseStatus
-    }
+
   },
 
   mounted(){
-    this.$store.dispatch('fetchAll');
+    this.$store.dispatch('fetchAll')
   },
 
   methods: {
-    openDetails(){
-      this.$store.dispatch('fetchById', this.itemSelected);
-    },
-
     openForm(){
       this.isOpenForm = true;
     },
@@ -106,7 +98,7 @@ export default {
 <style>
 .add-button{
   position: fixed;
-  bottom: 100px;
-  right: 100px;
+  bottom: 64px;
+  right: 24px;
 }
 </style>
