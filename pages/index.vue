@@ -1,87 +1,112 @@
 <template>
   <v-row justify="center" align="center">
-    <v-col cols="12" sm="8" md="6">
-      <v-card class="logo py-4 d-flex justify-center">
-        <NuxtLogo />
-        <VuetifyLogo />
-      </v-card>
-      <v-card>
-        <v-card-title class="headline">
-          Welcome to the Vuetify + Nuxt.js template
-        </v-card-title>
-        <v-card-text>
-          <p>
-            Vuetify is a progressive Material Design component framework for
-            Vue.js. It was designed to empower developers to create amazing
-            applications.
-          </p>
-          <p>
-            For more information on Vuetify, check out the
-            <a
-              href="https://vuetifyjs.com"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              documentation </a
-            >.
-          </p>
-          <p>
-            If you have questions, please join the official
-            <a
-              href="https://chat.vuetifyjs.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              title="chat"
-            >
-              discord </a
-            >.
-          </p>
-          <p>
-            Find a bug? Report it on the github
-            <a
-              href="https://github.com/vuetifyjs/vuetify/issues"
-              target="_blank"
-              rel="noopener noreferrer"
-              title="contribute"
-            >
-              issue board </a
-            >.
-          </p>
-          <p>
-            Thank you for developing with Vuetify and I look forward to bringing
-            more exciting features in the future.
-          </p>
-          <div class="text-xs-right">
-            <em><small>&mdash; John Leider</small></em>
-          </div>
-          <hr class="my-3" />
-          <a
-            href="https://nuxtjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Nuxt Documentation
-          </a>
-          <br />
-          <a
-            href="https://github.com/nuxt/nuxt.js"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Nuxt GitHub
-          </a>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn color="primary" nuxt to="/inspire"> Continue </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-col>
+    <v-col>
+      <v-card flat>
+      <v-list>
+        <v-subheader>Selecciona una tarea para mostrar sus detalles</v-subheader>
+      <v-list-item-group v-model="itemSelected" @change="openDetails()">
+        <template v-for="(item, index) in todoList">
+          <v-list-item :key="item.id" :value="item.id">
+            <template>
+              <v-list-item-avatar size="50">
+                <v-icon v-if="item.is_completed" color="success" size="50">
+                  mdi-check-circle
+                </v-icon>
+                <v-icon v-else size="50">
+                  mdi-clock
+                </v-icon>
+              </v-list-item-avatar>
+              <v-list-item-content>
+                <v-list-item-title >{{item.title}}</v-list-item-title>
+              </v-list-item-content>
+
+              <v-list-item-action>
+                <v-list-item-action-text > {{ item.due_date }}</v-list-item-action-text>
+              </v-list-item-action>
+            </template>
+          </v-list-item>
+          <v-divider
+            v-if="index < todoList.length - 1"
+            :key="index"
+          ></v-divider>
+        </template>
+      </v-list-item-group>
+    </v-list>
+  </v-card>
+  </v-col>
+    <TodoDetail v-if="itemSelected"  :details="todoDetails" @closeDetails="resetVariables()" @openEditDialog="assignTodo()" />
+    <TodoForm v-if="isOpenForm" :todo-edit="todoEdit"  @closeDialog="isOpenForm = false;"   />
+    <v-btn fab large color="primary" class="add-button" @click="openForm()">
+      <v-icon >
+        mdi-plus
+      </v-icon>
+    </v-btn>
   </v-row>
+
 </template>
 
 <script>
 export default {
   name: 'IndexPage',
+  components: {
+    TodoDetail: () => import('../components/TodoDetail.vue'),
+    TodoForm: () => import('../components/TodoForm.vue'),
+  },
+  data() {
+    return {
+      itemSelected: null,
+      todo: null,
+      isOpenForm: false,
+      todoEdit: null,
+    }
+  },
+
+  computed: {
+    todoList(){
+      return this.$store.state.todoList
+    },
+
+    todoDetails(){
+      return this.$store.state.details
+    },
+    responseStatus(){
+      return this.$store.state.getters.getResponseStatus
+    }
+  },
+
+  mounted(){
+    this.$store.dispatch('fetchAll');
+  },
+
+  methods: {
+    openDetails(){
+      this.$store.dispatch('fetchById', this.itemSelected);
+    },
+
+    openForm(){
+      this.isOpenForm = true;
+    },
+
+    assignTodo(){
+      this.todoEdit = Object.assign({}, this.todoDetails)
+      this.openForm();
+    },
+
+    resetVariables(){
+      this.itemSelected = null;
+      this.todoEdit = null;
+      this.$store.commit('setTodoDetails', null);
+    }
+  }
+
+
 }
 </script>
+
+<style>
+.add-button{
+  position: fixed;
+  bottom: 100px;
+  right: 100px;
+}
+</style>
