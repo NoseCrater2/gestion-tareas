@@ -84,6 +84,10 @@ export default {
     AppDialog: () => import('../Layout/AppDialog.vue')
   },
   props: {
+
+    /**
+     * Tarea que llena el formulario en caso de seleccionar edición de una tarea
+     */
     todoEdit: {
       type: Object,
       required: false,
@@ -108,21 +112,30 @@ export default {
     }
   },
 
+  /**
+   * Si la propiedad todoEdit contiene información el forumlario es llenado con esta información
+   */
   created(){
-
     if(!this.todoEdit){
       return;
     }
     this.todo = this.todoEdit;
-
   },
 
   methods: {
+    /**
+     * Emite el click al botón de cancelado del dialogo
+     */
     closeTaskCreate(){
       this.$emit('closeDialog');
       this.isCreateTaskLoading = false;
     },
 
+    /**
+     * Comprueba el forumlario, en caso de no ser valido despliega errores,
+     * en caso contrario comprueba si se está editanto o guardado una tarea
+     * para despachar la acción correspondiente del store
+     */
     confirmTaskCreate(){
       if( !this.$refs.taskForm.validate()){
         return;

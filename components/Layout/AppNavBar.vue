@@ -10,8 +10,14 @@
 </template>
 
 <script>
+/**
+ * Barra de navegación posicionada en la parte superior de la página
+ */
 export default {
   props: {
+    /**
+     * Título de la app
+     */
     title:{
       type: String,
       required: true

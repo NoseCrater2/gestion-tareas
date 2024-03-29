@@ -80,10 +80,19 @@
 
 <script>
 export default {
+  /**
+   * Componente para mostrar todo el contenido disponible de una tarea
+   */
   components: {
     TaskDelete: () => import('./TaskDelete.vue'),
   },
+
+
   props:{
+    /**
+   * Id de la tarea
+   *
+   */
     taskId: {
       type: Number,
       required: true,
@@ -98,6 +107,9 @@ export default {
   },
 
   computed: {
+    /**
+     * Obtiene los detalles de la tarea seleccionada desde el store
+     */
     todoDetails(){
       return this.$store.state.details
     },
@@ -105,23 +117,43 @@ export default {
   },
 
   watch:{
+    /**
+     * Watcher para detectar el cambio de id seleccionado y cargar los datos en base a este id
+     * @param {number} newValue
+     */
     taskId( newValue){
       this.$store.dispatch('fetchById', newValue);
     }
   },
 
+  /**
+   * Carga de datos en la primera vez que se carga el componente
+   */
   mounted(){
     this.$store.dispatch('fetchById', this.taskId);
   },
 
 
   methods:{
+    /**
+     * Emite el evento disparado al hacer click en el botón close
+     */
     closeDetails(){
       this.$emit('closeDetails')
     },
+
+    /**
+     * Emite el evento disparado al hacer click en el botón editar
+     */
     openEditDialog(){
       this.$emit('openEditDialog')
     },
+
+    /**
+     * Evalua el valor emitido por el evento de cierre del dialogo de confirmación de eliminación,
+     * si es true el componente de detalles también se cerrará, si es false solo el dialogo de eliminación de cerrará
+     * @param {boolean} isDeleted
+     */
     closeDeleteDialog(isDeleted){
       this.isDeleteDialogOpen = false;
       if(isDeleted){

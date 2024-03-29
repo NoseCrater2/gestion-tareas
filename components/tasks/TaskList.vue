@@ -10,6 +10,10 @@
 </template>
 
 <script>
+
+/**
+ * Contenedor para el listado de tareas
+ */
 export default {
 
   components: {
@@ -25,6 +29,10 @@ export default {
 
 
   methods:{
+    /**
+     * Emite el id de la tarea seleccionada a su componente padre
+     * @param number taskSelected
+     */
     updateSelection(taskSelected){
       this.$emit('getTaskSelected', taskSelected);
     }

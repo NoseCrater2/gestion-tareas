@@ -23,9 +23,20 @@
 </template>
 
 <script>
+/**
+ * Elemento de la lista de tareas
+ */
 
 export default {
   props:{
+
+    /**
+     * Una tarea proveniente del listado de tareas
+     * @id{string}
+     * @title{string}
+     * @is_completed{0 | 1}
+     * @due_date{string}
+     */
     item: {
       type: Object,
       required: true

@@ -9,8 +9,14 @@
 </template>
 
 <script>
+/**
+ * Footer de la app
+ */
 export default {
   props: {
+    /**
+     * Título de la app
+     */
     title:{
       type: String,
       required: true
