@@ -1,12 +1,11 @@
 <template>
   <v-snackbar
-      class="ma-0 pa-0"
+      app
       :timeout="2000"
-      :value="responseStatus.code !== 0"
-      absolute
+      :value="responseStatus.code !== null"
       right
       top
-      :color="applyColor()"
+      :color="responseStatus.code"
       @input="hideAlert()"
     >
    {{ responseStatus.message }}
@@ -20,25 +19,12 @@ export default {
     }
   },
   methods: {
-    applyColor(){
-      switch (this.responseStatus.code) {
-        case 200:
-          return 'success';
-        case 201:
-          return 'warning';
-        case 401:
-        case 404:
-        case 500:
-        case 403:
-          return 'error';
-      }
-    },
     hideAlert(){
       setTimeout(() => {
         this.$store.commit(
           'setResponseStatus',
         {
-          code: 0,
+          code: null,
           message: null
         }
         )

@@ -74,14 +74,14 @@
           </v-btn>
         </v-card-actions>
       </v-card>
-      <TodoDeleteDialog v-if="isDeleteDialogOpen" :todo-title="todoDetails.title" :todo-id="todoDetails.id" @closeDialog="closeDeleteDialog($event)" />
+      <TaskDelete v-if="isDeleteDialogOpen" :todo-title="todoDetails.title" :todo-id="todoDetails.id" @closeDialog="closeDeleteDialog($event)" />
     </v-navigation-drawer>
 </template>
 
 <script>
 export default {
   components: {
-    TodoDeleteDialog: () => import('../components/TodoDeleteDialog.vue'),
+    TaskDelete: () => import('./TaskDelete.vue'),
   },
   props:{
     taskId: {

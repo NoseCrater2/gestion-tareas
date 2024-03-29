@@ -1,44 +1,21 @@
 <template>
-  <v-row justify="center" align="center">
-    <v-col>
-      <v-card flat >
-      <v-subheader>Selecciona una tarea para mostrar sus detalles</v-subheader>
-      <v-list max-height="75vh" style="overflow: auto">
-      <v-list-item-group v-model="itemSelected">
-        <template v-for="(item, index) in todoList">
-          <v-list-item :key="item.id" :value="item.id">
-              <v-list-item-avatar size="50">
-                <v-icon v-if="item.is_completed" color="success" size="50">
-                  mdi-check-circle
-                </v-icon>
-                <v-icon v-else size="50">
-                  mdi-clock
-                </v-icon>
-              </v-list-item-avatar>
-              <v-list-item-content>
-                <v-list-item-title >{{item.title}}</v-list-item-title>
-              </v-list-item-content>
 
-              <v-list-item-action>
-                <v-list-item-action-text > {{ item.due_date }}</v-list-item-action-text>
-              </v-list-item-action>
-          </v-list-item>
-          <v-divider
-            v-if="index < todoList.length - 1"
-            :key="index"
-          ></v-divider>
-        </template>
-      </v-list-item-group>
-    </v-list>
-  </v-card>
-  </v-col>
-    <TodoDetail v-if="itemSelected"  :task-id="itemSelected" @closeDetails="resetVariables()" @openEditDialog="assignTodo()" />
-    <TodoForm v-if="isOpenForm" :todo-edit="todoEdit"  @closeDialog="isOpenForm = false;"   />
+  <v-row justify="center" align="center">
+
+    <v-col>
+      <TaskList :task-list="todoList" @getTaskSelected="changeTask($event)" />
+    </v-col>
+
+    <TaskDetail v-if="taskSelected"  :task-id="taskSelected" @closeDetails="resetVariables()" @openEditDialog="assignTodo()" />
+
+    <TaskForm v-if="isOpenForm" :todo-edit="todoEdit"  @closeDialog="isOpenForm = false;"   />
+
     <v-btn fab large color="primary" class="add-button" @click="openForm()">
       <v-icon >
         mdi-plus
       </v-icon>
     </v-btn>
+
   </v-row>
 
 </template>
@@ -47,13 +24,13 @@
 export default {
   name: 'IndexPage',
   components: {
-    TodoDetail: () => import('../components/TodoDetail.vue'),
-    TodoForm: () => import('../components/TodoForm.vue'),
+    TaskDetail: () => import('../components/tasks/TaskDetail.vue'),
+    TaskForm: () => import('../components/tasks/TaskForm.vue'),
+    TaskList: () => import('../components/tasks/TaskList.vue'),
   },
   data() {
     return {
-      itemSelected: null,
-      todo: null,
+      taskSelected: null,
       isOpenForm: false,
       todoEdit: null,
     }
@@ -85,13 +62,15 @@ export default {
     },
 
     resetVariables(){
-      this.itemSelected = null;
+      this.taskSelected = null;
       this.todoEdit = null;
       this.$store.commit('setTodoDetails', null);
+    },
+
+    changeTask(task){
+      this.taskSelected = task;
     }
   }
-
-
 }
 </script>
 

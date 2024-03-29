@@ -24,28 +24,44 @@ export const actions = {
 
   },
 
-  async fetchById({ commit }, taskId) {
-   const {status, data} = await this.$axios.get(`tasks/${taskId}`)
-      commit('setTodoDetails', data[0]);
-      commit('setResponseStatus',{code: status, message: 'Task loaded'})
+  fetchById({ commit }, taskId) {
+   this.$axios.get(`tasks/${taskId}`).then(({data})=> {
+    commit('setTodoDetails', data[0]);
+    commit('setResponseStatus',{code: 'success', message: data.detail || 'Task loaded'})
+   }).catch(({response})=>{
+    commit('setResponseStatus',{code: 'error', message: response.data.detail})
+  })
+
+
   },
 
- async createTodo({ commit }, todo) {
-   const {status, data} =  await this.$axios.post(`tasks`, todo)
+ createTodo({ commit }, todo) {
+  this.$axios.post(`tasks`, todo).then(({data})=> {
     commit('addTodo', data.task);
-    commit('setResponseStatus',{code: status, message: data.detail})
+    commit('setResponseStatus',{code: 'success', message: data.detail})
+  }).catch(({response})=>{
+    commit('setResponseStatus',{code: 'error', message: response.data.detail})
+  })
   },
 
-  async updateById({ commit }, todo) {
-    const {status, data} = await this.$axios.put(`tasks/${todo.id}`, todo)
-    commit('updateTodo', data.task)
-    commit('setTodoDetails', data.task)
-    commit('setResponseStatus',{code: status, message: data.detail})
+  updateById({ commit }, todo) {
+    this.$axios.put(`tasks/${todo.id}`, todo).then(({data})=> {
+      commit('updateTodo', data.task)
+      commit('setTodoDetails', data.task)
+      commit('setResponseStatus',{code: 'success', message: data.detail})
+    }).catch(({response})=>{
+      commit('setResponseStatus',{code: 'error', message: response.data.detail})
+    })
+
   },
 
-  async deleteById({ commit }, taskId) {
-    const {status, data} =  await this.$axios.delete(`tasks/${taskId}`)
-    commit('setResponseStatus',{code: status, message: data.detail})
+  deleteById({ commit }, taskId) {
+    this.$axios.delete(`tasks/${taskId}`).then(({data})=> {
+      commit('setResponseStatus',{code: 'success', message: data.detail})
+    }).catch(({response})=>{
+      commit('setResponseStatus',{code: 'error', message: response.data.detail})
+    })
+
   },
 
 
