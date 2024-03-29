@@ -33,12 +33,5 @@ export default {
   },
 
 }
-
 </script>
 
-<style>
-.success{
-  background-color: green;
-  color: white;
-}
-</style>
