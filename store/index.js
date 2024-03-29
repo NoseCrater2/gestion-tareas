@@ -94,11 +94,4 @@ export const mutations = {
   setResponseStatus(state, responseStatus){
     state.responseStatus = responseStatus
   },
-
-  toggle(state, todo) {
-    todo.done = !todo.done
-  }
 }
-
-
-
